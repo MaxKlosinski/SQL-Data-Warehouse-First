@@ -1,0 +1,25 @@
+Each file name will have -> snake case convention.
+
+How will be named tables in database:
+
+#Bronze Rules
+
+All names must start with the source system name, and table names must match their original names without renaming.
+
+<sourcesystem> _<entity>
+<sourcesystem> : Name of the source file.
+<entity> : Exact table name from the source file.
+
+Example: crm_customer_info - Customer information from the CRM system.
+
+#Stored Procedure
+
+All stored procedures used for loading data must follow the naming pattern:
+
+load _< layer>
+
+<layer> : Represents the layer being loaded, such as bronze , silver , or gold .
+
+Example:
+load_bronze - Stored procedure for loading data into the Bronze layer.
+load_silver - Stored procedure for loading data into the Silver layer.
