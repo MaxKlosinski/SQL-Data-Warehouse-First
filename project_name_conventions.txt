@@ -1,4 +1,5 @@
 Each file name will have -> snake case convention.
+Each folder name will have -> CamelCase
 
 How will be named tables in database:
 
