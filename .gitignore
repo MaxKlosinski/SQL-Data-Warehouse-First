@@ -1,0 +1,9 @@
+# drawio temp files
+*.bkp
+
+# temp obsydian files
+.obsidian/
+
+# virtual py folders and logs
+pyspark_pipeline/dbt_medalion/.venv/
+pyspark_pipeline/dbt_medalion/logs/
