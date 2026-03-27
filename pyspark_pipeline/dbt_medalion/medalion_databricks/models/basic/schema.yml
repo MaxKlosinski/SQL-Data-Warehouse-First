@@ -1,0 +1,6 @@
+
+version: 2
+
+models:
+  - name: bronze_crm_cust_info
+    description: "A starter dbt model"

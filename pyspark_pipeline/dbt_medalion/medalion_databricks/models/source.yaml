@@ -1,0 +1,81 @@
+sources:
+  - name: crm_sources
+    description: A data source for the CRM system.
+    database: bronze
+    schema: crm
+
+    tables:
+      - name: cust_info
+        description: The table contains customer information for CRM purposes. It includes details such as customer IDs, names, marital status, gender, and the date of account creation. This data can be used to analyze customer demographics, identify trends within customer groups, and support targeted marketing efforts.
+        identifier: bronze_crm_cust_info
+        config:
+          loaded_at_field: cst_create_date
+          freshness:
+            warn_after:
+              count: 48
+              period: hour
+
+        columns:
+          - name: cst_id
+            data_tests:
+              - not_null
+              - unique
+
+          - name: cst_marital_status
+            data_tests:
+              - accepted_values:
+                  arguments:
+                    values: ['S', 'M', 'F']
+          - name: cst_gndr
+            data_tests:
+              - accepted_values:
+                  arguments:
+                    values: ['S', 'M', 'F']
+
+      - name: prd_info
+        description: The table contains product information used in CRM processes. It includes details such as product IDs, names, costs, and relevant date ranges. This data can be used to track product offerings, analyze pricing strategies, and manage inventory timelines.\
+        identifier: bronze_crm_prd_info
+        data_tests:
+          # Date Logic Validity Check
+          # Description: Ensures that the Product Start Date does not occur after 
+          # the Product End Date.
+          # Expectation: No results returned.
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "prd_end_dt > prd_start_dt or prd_end_dt is null"
+        columns:
+          - name: prd_id
+            data_tests:
+              - not_null
+              - unique
+          - name: prd_cost
+            data_tests:
+              - not_null
+          - name: prd_line
+            data_tests:
+              - accepted_values:
+                  arguments:
+                    values: ['R', 'S', 'M', 'T']
+          - name: prd_key
+            data_tests:
+              - dbt_expectations.expect_column_values_to_not_match_regex:
+                  arguments:
+                    regex: "\\s"
+            
+      - name: sales_details
+        description: This table contains detailed sales information related to customer orders. It includes data such as order number, product key, customer ID, order dates, shipping dates, due dates, sales amounts, quantities, and prices. Users can utilize this data for analyzing sales trends, evaluating product performance, and improving customer relationship management.
+        identifier: bronze_crm_sales_details
+        data_tests:
+          # We're checking to see if the the total sales value (sls_sales) 
+          # always equals the unit price (sls_price) multiplied by the 
+          # quantity (sls_quantity). The math adds up in the visible rows 
+          # (e.g., 1 * 3578 = 3578), but you need to verify this for the entire table.
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "sls_price + sls_quantity = sls_sales"
+          # We ensure that the columns sls_sales, sls_quantity, and sls_price are 
+          # always greater than zero (no negative or zero values for completed orders).
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "sls_price > 0 and sls_quantity > 0 and sls_sales > 0"
+
