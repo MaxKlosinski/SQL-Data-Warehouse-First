@@ -5,6 +5,7 @@ models:
       incremental_strategy: merge
       unique_key: ['cst_id', 'cst_key']
       alias: silver_crm_cust_info
+      on_schema_change: append_new_columns
 
     columns:
       - name: cst_id

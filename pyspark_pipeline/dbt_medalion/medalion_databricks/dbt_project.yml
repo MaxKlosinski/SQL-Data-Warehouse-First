@@ -25,6 +25,7 @@ clean-targets:         # directories to be removed by `dbt clean`
 flags:
   use_managed_iceberg: true
   use_concurrent_microbatch: true
+  use_materialization_v2: true
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
@@ -35,8 +36,8 @@ models:
       crm:
         +enabled: true
         +tags: silver_crm
-        +database: bronze
-        +schema: crm
+        +database: silver
+        +schema: silver_crm
         +full_refresh: false
         +contract:
           enforced: true
