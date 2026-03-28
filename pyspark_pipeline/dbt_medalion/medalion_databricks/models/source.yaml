@@ -48,14 +48,17 @@ sources:
             data_tests:
               - not_null
               - unique
+
           - name: prd_cost
             data_tests:
               - not_null
+
           - name: prd_line
             data_tests:
               - accepted_values:
                   arguments:
                     values: ['R', 'S', 'M', 'T']
+
           - name: prd_key
             data_tests:
               - dbt_expectations.expect_column_values_to_not_match_regex:
@@ -78,4 +81,71 @@ sources:
           - dbt_utils.expression_is_true:
               arguments:
                 expression: "sls_price > 0 and sls_quantity > 0 and sls_sales > 0"
+          
+        columns:
+          - name: sls_ord_num
+            data_tests:
+                - not_null
+                - unique
 
+          - name: sls_prd_key
+            data_tests:
+                - not_null
+                - unique
+          
+          - name: sls_cust_id
+            data_tests:
+                - not_null
+                - unique
+                - relationships:
+                    arguments:
+                      to: source('crm_sources', 'cust_info')
+                      field: cst_id
+      
+  - name: erp_sources
+    description: A data source for the ERP system.
+    database: bronze
+    schema: erp
+    
+    tables:
+      - name: cust_az12
+        description: The table contains customer records from the ERP system, including details such as customer ID, birthdate, and gender. It also includes a field for error records, which can help in identifying incomplete or erroneous data. Use cases include analyzing customer demographics and ensuring data quality in customer records.
+        identifier: bronze_erp_cust_az12
+        
+        columns:
+          - name: CID
+            data_tests:
+                - not_null
+                - unique
+          
+          - name: GEN
+            data_tests:
+              - accepted_values:
+                  arguments:
+                    values: ['Male', 'Female']
+      
+      - name: loc_a101
+        description: The table contains information related to ERP data localization, focusing on country-specific identifiers. Potential use cases include analyzing regional data distribution and identifying discrepancies in records. It also includes a column for error records, which can help in troubleshooting and data validation.
+        identifier: bronze_erp_loc_a101
+        
+        columns:
+          - name: CID
+            data_tests:
+                - not_null
+                - unique
+      
+      - name: px_cat_g1v2
+        description: This table contains product category information from the ERP system. It includes details about main categories and subcategories, along with a field for maintenance notes. Potential use cases include analyzing product categorization, tracking changes in product lines, and identifying any errors in the category data.
+        identifier: bronze_erp_px_cat_g1v2
+        
+        columns:
+          - name: ID
+            data_tests:
+                - not_null
+                - unique
+          
+          - name: MAINTENANCE
+            data_tests:
+              - accepted_values:
+                  arguments:
+                    values: ['Yes', 'No']

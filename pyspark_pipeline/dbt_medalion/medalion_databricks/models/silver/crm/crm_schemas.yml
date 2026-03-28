@@ -1,0 +1,41 @@
+models:
+  - name: bronze_clean_crm_cust_info
+    config:
+      materialized: incremental
+      incremental_strategy: merge
+      unique_key: ['cst_id', 'cst_key']
+      alias: silver_crm_cust_info
+
+    columns:
+      - name: cst_id
+        data_type: int
+        description: "A unique technical identifier for the customer."
+        constraints:
+          - type: primary_key
+          - type: not_null
+
+      - name: cst_key
+        data_type: string
+        description: "A business key for the customer (e.g., AW00011000)."
+        constraints:
+          - type: not_null
+
+      - name: cst_firstname
+        data_type: string
+        description: "The first name of the customer."
+
+      - name: cst_lastname
+        data_type: string
+        description: "The last name of the customer."
+
+      - name: cst_marital_status
+        data_type: string
+        description: "The marital status of the customer (e.g., M - Married, S - Single)."
+
+      - name: cst_gndr
+        data_type: string
+        description: "The gender of the customer (M/F)."
+
+      - name: cst_create_date
+        data_type: date
+        description: "The date when the record was created in the source system."

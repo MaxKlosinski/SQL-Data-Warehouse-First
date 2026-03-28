@@ -29,11 +29,14 @@ flags:
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
 
-# In this example config, we tell dbt to build all models in the example/
-# directory as views. These settings can be overridden in the individual model
-# files using the `{{ config(...) }}` macro.
 models:
   medalion_databricks:
-    # Config indicated by + and applies to all files under models/example/
-    example:
-      +materialized: view
+    silver:
+      crm:
+        +enabled: true
+        +tags: silver_crm
+        +database: bronze
+        +schema: crm
+        +full_refresh: false
+        +contract:
+          enforced: true
