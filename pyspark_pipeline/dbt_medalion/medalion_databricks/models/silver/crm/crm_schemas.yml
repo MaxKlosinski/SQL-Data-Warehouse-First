@@ -12,7 +12,6 @@ models:
         data_type: int
         description: "A unique technical identifier for the customer."
         constraints:
-          - type: primary_key
           - type: not_null
 
       - name: cst_key
@@ -35,8 +34,124 @@ models:
 
       - name: cst_gndr
         data_type: string
-        description: "The gender of the customer (M/F)."
+        description: "The gender of the customer."
 
       - name: cst_create_date
         data_type: date
         description: "The date when the record was created in the source system."
+
+  - name: bronze_clean_crm_prd_info
+    config:
+      materialized: incremental
+      incremental_strategy: merge
+      unique_key: ['prd_id', 'prd_end_dt', 'prd_start_dt']
+      alias: silver_crm_prd_info
+      on_schema_change: append_new_columns
+    constraints:
+      - type: check
+        expression: "prd_start_dt <= prd_end_dt OR prd_end_dt IS NULL"
+        columns: ['prd_start_dt', 'prd_end_dt']
+
+    columns:
+      - name: prd_id
+        data_type: int
+        description: "A unique technical identifier for the product."
+
+      - name: cat_id
+        data_type: string
+        description: "A category identifier derived from the product key."
+
+      - name: prd_key
+        data_type: string
+        description: "A business key for the product (e.g., BK-PRD-00001)."
+
+      - name: prd_nm
+        data_type: string
+        description: "The name of the product."
+
+      - name: prd_cost
+        data_type: int
+        description: "The cost of the product. Null values are treated as 0."
+        constraints:
+          - type: not_null
+
+      - name: prd_line
+        data_type: string
+        description: "The product line (e.g., Mountain, Road, Touring)."
+
+      - name: prd_start_dt
+        data_type: date
+        description: "The start date of the product's validity period."
+
+      - name: prd_end_dt
+        data_type: timestamp
+        description: "The end date of the product's validity period, calculated as the day before the next record's start date for the same product key."
+  
+  - name: bronze_clean_crm_sales_details
+    config:
+      materialized: incremental
+      incremental_strategy: merge
+      unique_key: ['sls_ord_num']
+      alias: silver_crm_sales_details
+      on_schema_change: append_new_columns
+
+    constraints:
+      - type: check
+        name: check_valid_ship_date
+        columns: [sls_ship_dt]
+        expression: >
+          sls_ship_dt > 0 
+          AND length(cast(sls_ship_dt as string)) = 8 
+          AND cast(sls_ship_dt AS int) BETWEEN 19000101 AND 20500101
+
+      - type: check
+        name: check_sales_math_and_positive
+        columns: [sls_sales, sls_quantity, sls_price]
+        expression: >
+          sls_sales = (sls_quantity * sls_price) 
+          AND sls_sales > 0 
+          AND sls_quantity > 0 
+          AND sls_price > 0
+
+    columns:
+      - name: sls_ord_num
+        data_type: string
+        description: "The sales order number from the source system."
+        
+      - name: sls_prd_key
+        data_type: string
+        description: "The product key associated with the sales order."
+
+      - name: sls_cust_id
+        data_type: int
+        description: "The customer ID associated with the sales order."
+
+      - name: sls_order_dt
+        data_type: string
+        description: "The date when the order was placed."
+
+      - name: sls_ship_dt
+        data_type: string
+        description: "The date when the order was shipped."
+
+      - name: sls_due_dt
+        data_type: string
+        description: "The date when the order is due."
+
+      - name: sls_sales
+        data_type: int
+        description: "The total sales amount for the order."
+        constraints:
+          - type: not_null
+
+      - name: sls_quantity
+        data_type: int
+        description: "The quantity of products sold in the order."
+        constraints:
+          - type: not_null
+
+      - name: sls_price
+        data_type: double
+        description: "The price per unit for the products sold in the order."
+        constraints:
+          - type: not_null

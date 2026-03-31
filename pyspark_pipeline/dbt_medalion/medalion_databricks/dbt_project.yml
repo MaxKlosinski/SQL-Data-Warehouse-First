@@ -41,3 +41,11 @@ models:
         +full_refresh: false
         +contract:
           enforced: true
+      erp:
+        +enabled: true
+        +tags: silver_erp
+        +database: silver
+        +schema: silver_erp
+        +full_refresh: false
+        +contract:
+          enforced: true

@@ -1,0 +1,75 @@
+models:
+  - name: bronze_clean_erp_CUSR_AZ12
+    config:
+      materialized: incremental
+      incremental_strategy: merge
+      unique_key: ['CID', 'BDATE']
+      alias: silver_erp_cusr_az12
+      on_schema_change: append_new_columns
+    columns:
+      - name: CID
+        data_type: string
+        description: "A unique technical identifier for the customer."
+        constraints:
+          - type: not_null
+      - name: BDATE
+        data_type: date
+        description: "The birth date of the customer."
+      - name: GEN
+        data_type: string
+        description: "The gender of the customer"
+
+  - name: bronze_clean_erp_LOC_A101
+    config:
+      materialized: incremental
+      incremental_strategy: merge
+      unique_key: ['CID']
+      alias: silver_erp_loc_a101
+      on_schema_change: append_new_columns
+
+    columns:
+      - name: CID
+        data_type: string
+        description: "A unique technical identifier for the customer."
+        constraints:
+          - type: not_null
+
+      - name: CNTRY
+        data_type: string
+        description: "The country associated with the customer, standardized to full country names."
+
+  - name: bronze_clean_erp_PX_CAT_G1V2
+    config:
+      materialized: incremental
+      incremental_strategy: merge
+      unique_key: ['ID']
+      alias: silver_erp_px_cat_g1v2
+      on_schema_change: append_new_columns
+    constraints:
+      - type: check
+        name: check_no_leading_trailing_spaces
+        columns: [ID, CAT, SUBCAT, MAINTENANCE]
+        expression: >
+          ID = TRIM(ID) 
+          AND CAT = TRIM(CAT) 
+          AND SUBCAT = TRIM(SUBCAT) 
+          AND MAINTENANCE = TRIM(MAINTENANCE)
+
+    columns:
+      - name: ID
+        data_type: string
+        description: "A unique technical identifier for the category."
+        constraints:
+          - type: not_null
+
+      - name: CAT
+        data_type: string
+        description: "The main category classification for the product."
+
+      - name: SUBCAT
+        data_type: string
+        description: "The subcategory classification for the product, providing more granular categorization within the main category."
+
+      - name: MAINTENANCE
+        data_type: string
+        description: "Indicates whether the product is currently under maintenance (true) or not (false)."
