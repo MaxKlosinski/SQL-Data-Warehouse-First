@@ -1,0 +1,11 @@
+{
+    "dbt.dbtPythonPathOverride": "/home/max/Dokumenty/GitHub/SQL-Data-Warehouse-First/pyspark_pipeline/dbt_medalion/.venv/bin/python3",
+    "dbt.deferConfigPerProject": {
+        "pyspark_pipeline/dbt_medalion/medalion_databricks": {
+            "manifestPathForDeferral": "/home/max/Dokumenty/GitHub/SQL-Data-Warehouse-First/pyspark_pipeline/dbt_medalion/medalion_databricks/models",
+            "manifestPathType": "local",
+            "deferToProduction": false,
+            "favorState": false
+        }
+    }
+}

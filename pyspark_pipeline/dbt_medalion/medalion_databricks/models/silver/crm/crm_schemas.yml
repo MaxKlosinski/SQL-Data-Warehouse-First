@@ -3,7 +3,7 @@ models:
     config:
       materialized: incremental
       incremental_strategy: merge
-      unique_key: ['cst_id', 'cst_key']
+      unique_key: [ 'cst_id', 'cst_key' ]
       alias: silver_crm_cust_info
       on_schema_change: append_new_columns
 
@@ -39,18 +39,19 @@ models:
       - name: cst_create_date
         data_type: date
         description: "The date when the record was created in the source system."
+    description: The bronze_clean_crm_cust_info model processes customer information from the bronze CRM layer. It removes duplicate records based on customer ID (cst_id) and ensures only the most recent record is retained using the creation date (cst_create_date). Additionally, it cleans and standardizes customer attributes such as first name, last name, marital status, and gender. Marital status and gender are transformed into human-readable formats, and null values are handled appropriately.
 
   - name: bronze_clean_crm_prd_info
     config:
       materialized: incremental
       incremental_strategy: merge
-      unique_key: ['prd_id', 'prd_end_dt', 'prd_start_dt']
+      unique_key: [ 'prd_id', 'prd_end_dt', 'prd_start_dt' ]
       alias: silver_crm_prd_info
       on_schema_change: append_new_columns
     constraints:
       - type: check
         expression: "prd_start_dt <= prd_end_dt OR prd_end_dt IS NULL"
-        columns: ['prd_start_dt', 'prd_end_dt']
+        columns: [ 'prd_start_dt', 'prd_end_dt' ]
 
     columns:
       - name: prd_id
@@ -86,38 +87,34 @@ models:
       - name: prd_end_dt
         data_type: timestamp
         description: "The end date of the product's validity period, calculated as the day before the next record's start date for the same product key."
-  
+    description: The bronze_clean_crm_prd_info model processes raw product information from the CRM system, transforming and cleaning the data for further analysis. It includes operations such as extracting and formatting category IDs and product keys, handling null values in product costs, categorizing product lines, and calculating product end dates based on start dates. This model serves as a foundational layer for downstream analytics and reporting.
+
   - name: bronze_clean_crm_sales_details
     config:
       materialized: incremental
       incremental_strategy: merge
-      unique_key: ['sls_ord_num']
+      unique_key: [ 'sls_ord_num' ]
       alias: silver_crm_sales_details
       on_schema_change: append_new_columns
 
     constraints:
       - type: check
         name: check_valid_ship_date
-        columns: [sls_ship_dt]
+        columns: [ sls_ship_dt ]
         expression: >
-          sls_ship_dt > 0 
-          AND length(cast(sls_ship_dt as string)) = 8 
-          AND cast(sls_ship_dt AS int) BETWEEN 19000101 AND 20500101
+          sls_ship_dt > 0  AND length(cast(sls_ship_dt as string)) = 8  AND cast(sls_ship_dt AS int) BETWEEN 19000101 AND 20500101
 
       - type: check
         name: check_sales_math_and_positive
-        columns: [sls_sales, sls_quantity, sls_price]
+        columns: [ sls_sales, sls_quantity, sls_price ]
         expression: >
-          sls_sales = (sls_quantity * sls_price) 
-          AND sls_sales > 0 
-          AND sls_quantity > 0 
-          AND sls_price > 0
+          sls_sales = (sls_quantity * sls_price)  AND sls_sales > 0  AND sls_quantity > 0  AND sls_price > 0
 
     columns:
       - name: sls_ord_num
         data_type: string
         description: "The sales order number from the source system."
-        
+
       - name: sls_prd_key
         data_type: string
         description: "The product key associated with the sales order."
@@ -155,3 +152,4 @@ models:
         description: "The price per unit for the products sold in the order."
         constraints:
           - type: not_null
+    description: The bronze_clean_crm_sales_details model processes raw sales data from the CRM system, ensuring data quality and consistency. It performs deduplication, validates and formats date fields, and calculates accurate sales and price values based on quantity and price. This model serves as a cleaned and standardized version of the raw sales data for downstream analysis.

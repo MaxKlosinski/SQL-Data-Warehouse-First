@@ -3,7 +3,7 @@ models:
     config:
       materialized: incremental
       incremental_strategy: merge
-      unique_key: ['CID', 'BDATE']
+      unique_key: [ 'CID', 'BDATE' ]
       alias: silver_erp_cusr_az12
       on_schema_change: append_new_columns
     columns:
@@ -18,12 +18,13 @@ models:
       - name: GEN
         data_type: string
         description: "The gender of the customer"
+    description: The bronze_clean_erp_CUSR_AZ12 model processes customer data from the bronze ERP layer by cleaning and standardizing the data. It removes invalid entries, formats gender values, and ensures birth dates are valid. Additionally, it eliminates duplicate records, retaining only the most recent entry based on the birth date.
 
   - name: bronze_clean_erp_LOC_A101
     config:
       materialized: incremental
       incremental_strategy: merge
-      unique_key: ['CID']
+      unique_key: [ 'CID' ]
       alias: silver_erp_loc_a101
       on_schema_change: append_new_columns
 
@@ -42,18 +43,15 @@ models:
     config:
       materialized: incremental
       incremental_strategy: merge
-      unique_key: ['ID']
+      unique_key: [ 'ID' ]
       alias: silver_erp_px_cat_g1v2
       on_schema_change: append_new_columns
     constraints:
       - type: check
         name: check_no_leading_trailing_spaces
-        columns: [ID, CAT, SUBCAT, MAINTENANCE]
+        columns: [ ID, CAT, SUBCAT, MAINTENANCE ]
         expression: >
-          ID = TRIM(ID) 
-          AND CAT = TRIM(CAT) 
-          AND SUBCAT = TRIM(SUBCAT) 
-          AND MAINTENANCE = TRIM(MAINTENANCE)
+          ID = TRIM(ID)  AND CAT = TRIM(CAT)  AND SUBCAT = TRIM(SUBCAT)  AND MAINTENANCE = TRIM(MAINTENANCE)
 
     columns:
       - name: ID
@@ -73,3 +71,4 @@ models:
       - name: MAINTENANCE
         data_type: string
         description: "Indicates whether the product is currently under maintenance (true) or not (false)."
+    description: The bronze_clean_erp_PX_CAT_G1V2 model is designed to extract and clean data from the bronze ERP source table bronze_erp_px_cat_g1v2. It selects specific columns (ID, CAT, SUBCAT, MAINTENANCE) to provide a streamlined dataset for further processing and analysis.
