@@ -1,23 +1,9 @@
-WITH source_data AS (
-    SELECT * FROM {{ source('crm_sources', 'sales_details') }}
-),
-
-deduplicated AS (
-    SELECT 
-        *,
-        ROW_NUMBER() OVER (
-            PARTITION BY sls_ord_num
-            ORDER BY sls_ord_num DESC
-        ) as row_num
-    FROM source_data
-),
-
-final_processing AS (
+WITH base_data AS (
     SELECT 
         sls_ord_num
         ,sls_prd_key
         ,sls_cust_id
-        
+            
         /*
         ----------------------------------------------------------------------
         DATE TRANSFORMATION SECTION
@@ -71,8 +57,11 @@ final_processing AS (
                 ELSE sls_price
             END AS sls_price
 
-    FROM deduplicated
-    WHERE row_num = 1 -- Keep only the first occurrence of duplicates
+    FROM 
+        {{ref('stg_crm__sales_details')}}
 )
 
-SELECT * FROM final_processing
+SELECT
+    *
+FROM
+    base_data

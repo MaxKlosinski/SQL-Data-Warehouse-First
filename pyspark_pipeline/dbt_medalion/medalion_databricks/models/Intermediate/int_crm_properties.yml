@@ -1,0 +1,149 @@
+models:
+  - name: int_crm__cust_info
+    config:
+      unique_key: [ 'cst_id', 'cst_key' ]
+      alias: int_crm__cust_info
+      on_schema_change: append_new_columns
+
+    columns:
+      - name: cst_id
+        data_type: int
+        description: "A unique technical identifier for the customer."
+        constraints:
+          - type: not_null
+
+      - name: cst_key
+        data_type: string
+        description: "A business key for the customer (e.g., AW00011000)."
+        constraints:
+          - type: not_null
+
+      - name: cst_firstname
+        data_type: string
+        description: "The first name of the customer."
+
+      - name: cst_lastname
+        data_type: string
+        description: "The last name of the customer."
+
+      - name: cst_marital_status
+        data_type: string
+        description: "The marital status of the customer (e.g., M - Married, S - Single)."
+
+      - name: cst_gndr
+        data_type: string
+        description: "The gender of the customer."
+
+      - name: cst_create_date
+        data_type: date
+        description: "The date when the record was created in the source system."
+    description: The bronze_clean_crm_cust_info model processes customer information from the bronze CRM layer. It removes duplicate records based on customer ID (cst_id) and ensures only the most recent record is retained using the creation date (cst_create_date). Additionally, it cleans and standardizes customer attributes such as first name, last name, marital status, and gender. Marital status and gender are transformed into human-readable formats, and null values are handled appropriately.
+
+  - name: int_crm__prd_info
+    config:
+      unique_key: [ 'prd_id', 'prd_end_dt', 'prd_start_dt' ]
+      alias: int_crm__prd_info
+      on_schema_change: append_new_columns
+    constraints:
+      - type: check
+        expression: "prd_start_dt <= prd_end_dt OR prd_end_dt IS NULL"
+        columns: [ 'prd_start_dt', 'prd_end_dt' ]
+
+    columns:
+      - name: prd_id
+        data_type: int
+        description: "A unique technical identifier for the product."
+
+      - name: cat_id
+        data_type: string
+        description: "A category identifier derived from the product key."
+
+      - name: prd_key
+        data_type: string
+        description: "A business key for the product (e.g., BK-PRD-00001)."
+
+      - name: prd_nm
+        data_type: string
+        description: "The name of the product."
+
+      - name: prd_cost
+        data_type: int
+        description: "The cost of the product. Null values are treated as 0."
+        constraints:
+          - type: not_null
+
+      - name: prd_line
+        data_type: string
+        description: "The product line (e.g., Mountain, Road, Touring)."
+
+      - name: prd_start_dt
+        data_type: date
+        description: "The start date of the product's validity period."
+
+      - name: prd_end_dt
+        data_type: timestamp
+        description: "The end date of the product's validity period, calculated as the day before the next record's start date for the same product key."
+    description: The int_crm__prd_info model processes product information from the staging table stg_crm__prd_info. It transforms and enriches the data by deriving category IDs from product keys, normalizing product lines into descriptive labels, and calculating product end dates based on the start dates using a window function. This model serves as an intermediate layer for CRM product data, ensuring consistency and usability for downstream analytics.
+
+  - name: int_crm__sales_details
+    config:
+      unique_key: [ 'sls_ord_num' ]
+      alias: int_crm__sales_details
+      on_schema_change: append_new_columns
+
+    constraints:
+      - type: check
+        name: check_valid_ship_date
+        columns: [ sls_ship_dt ]
+        expression: >
+          sls_ship_dt > 0  AND length(cast(sls_ship_dt as string)) = 8  AND cast(sls_ship_dt AS int) BETWEEN 19000101 AND 20500101
+
+      - type: check
+        name: check_sales_math_and_positive
+        columns: [ sls_sales, sls_quantity, sls_price ]
+        expression: >
+          sls_sales = (sls_quantity * sls_price)  AND sls_sales > 0  AND sls_quantity > 0  AND sls_price > 0
+
+    columns:
+      - name: sls_ord_num
+        data_type: string
+        description: "The sales order number from the source system."
+
+      - name: sls_prd_key
+        data_type: string
+        description: "The product key associated with the sales order."
+
+      - name: sls_cust_id
+        data_type: int
+        description: "The customer ID associated with the sales order."
+
+      - name: sls_order_dt
+        data_type: string
+        description: "The date when the order was placed."
+
+      - name: sls_ship_dt
+        data_type: string
+        description: "The date when the order was shipped."
+
+      - name: sls_due_dt
+        data_type: string
+        description: "The date when the order is due."
+
+      - name: sls_sales
+        data_type: int
+        description: "The total sales amount for the order."
+        constraints:
+          - type: not_null
+
+      - name: sls_quantity
+        data_type: int
+        description: "The quantity of products sold in the order."
+        constraints:
+          - type: not_null
+
+      - name: sls_price
+        data_type: double
+        description: "The price per unit for the products sold in the order."
+        constraints:
+          - type: not_null
+    description: The int_crm__sales_details model processes and transforms raw sales data from the staging layer. It ensures data quality by validating and formatting date fields (order, ship, and due dates) and recalculates sales and price values when necessary to maintain consistency. This model serves as an intermediate layer for CRM sales analytics, providing clean and reliable data for downstream analysis.

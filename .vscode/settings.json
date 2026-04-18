@@ -7,5 +7,6 @@
             "deferToProduction": false,
             "favorState": false
         }
-    }
+    },
+    "dbt.perspectiveTheme": "Vintage"
 }

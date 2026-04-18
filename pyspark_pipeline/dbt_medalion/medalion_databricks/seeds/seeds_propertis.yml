@@ -1,0 +1,28 @@
+seeds:
+  - name: gender_standaryzation
+    config:
+        column_types: 
+                gender: string
+                stanaryzation_gender: string
+        delimiter: ","
+
+  - name: martial_standaryzation
+    config:
+        column_types: 
+                martial: string
+                new_martial: string
+        delimiter: ","
+
+  - name: product_line_standaryzation
+    config:
+        column_types: 
+                prd_line: string
+                standardized_prd_line: string
+        delimiter: ","
+
+  - name: country_standaryzation
+    config:
+        column_types: 
+                country: string
+                country_standardized: string
+        delimiter: ","

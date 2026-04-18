@@ -1,0 +1,147 @@
+models:
+  - name: dim_customer_info
+    config:
+      unique_key: [ 'customer_id' ]
+      alias: dim_customer_info
+      on_schema_change: append_new_columns
+
+    columns:
+      - name: customer_surrogate_id
+        data_type: integer
+        description: A unique identifier for each customer, generated using the ROW_NUMBER() function based on the ascending order of customer IDs.
+
+      - name: customer_id
+        data_type: int
+        constraints:
+          - type: not_null
+        description: A unique identifier for the customer, sourced from the CRM system. This ID is used to track customer-related information across various systems.
+
+      - name: customer_key
+        data_type: string
+        description: A unique identifier for the customer, used to join data across different systems and tables.
+
+      - name: firstname
+        data_type: string
+        description: The first name of the customer, sourced from the CRM system.
+
+      - name: lastname
+        data_type: string
+        description: The last name of the customer, sourced from the CRM system.
+
+      - name: country
+        data_type: string
+        description: Represents the country associated with the customer, sourced from the `stg_erp__loc_a101` staging table.
+
+      - name: gender
+        data_type: string
+        description: Indicates the gender of the customer, sourced from the ERP system (stg_erp__cusr_az12).
+
+      - name: birthday
+        data_type: date
+        description: "The date of birth of the customer, sourced from the ERP system (stg_erp__cusr_az12)."
+
+      - name: marital_status
+        data_type: string
+        description: Indicates the marital status of the customer, such as single, married, divorced, or widowed.
+
+      - name: create_date
+        data_type: timestamp
+        description: The timestamp indicating when the customer record was created in the CRM system.
+    description: The dim_customer_info model consolidates customer data from multiple sources, including CRM and ERP systems, to create a unified view of customer information. It includes details such as customer identifiers, personal information, location, and demographic attributes. This model is designed to support analytics and reporting by providing a comprehensive dataset for customer insights.
+  - name: dim_product_info
+    config:
+      unique_key: [ 'product_id' ]
+      alias: dim_product_info
+      on_schema_change: append_new_columns
+
+    columns:
+      - name: product_id
+        data_type: int
+        constraints:
+          - type: not_null
+        description: The identifier for the product sourced from the CRM staging table, representing the primary key for the product.
+
+      - name: category_id
+        data_type: string
+        description: The identifier for the product category, derived by transforming the first five characters of the product key.
+
+      - name: category
+        data_type: string
+        description: Represents the high-level classification of the product, derived from the ERP system's category data.
+
+      - name: subcategory
+        data_type: string
+        description: Provides a more granular classification within the category, offering additional detail about the product type.
+
+      - name: product_number
+        data_type: string
+        description: A unique identifier for the product, derived from the prd_key column in the source data.
+
+      - name: product_name
+        data_type: string
+        description: The name of the product, sourced directly from the prd_nm column in the staging data.
+
+      - name: product_line
+        data_type: string
+        description: Indicates the type of product line. Possible values include 'Mountain', 'Road', 'Other Sales', 'Touring', 'N\A', or the trimmed value of the product line from the source data.
+
+      - name: start_date
+        data_type: date
+        description: Represents the date when the product became available or started being tracked in the system.
+
+      - name: maintance
+        data_type: string
+        description: Indicates whether the product requires maintenance, as specified in the ERP system.
+
+      - name: product_cost
+        data_type: int
+        description: The cost of the product, represented as an integer, sourced from the prd_cost column in the staging data.
+
+      - name: product_key
+        data_type: int
+        description: A unique identifier for each product, generated using a row number based on the product's start date and product key.
+    description: The dim_product_info model provides a detailed view of product information by combining data from CRM and ERP systems. It includes attributes such as product identifiers, category details, maintenance information, product cost, and product line classification. This model is designed to support analytical use cases by offering a unified and enriched dataset for product-related insights.
+
+  - name: fact_sales
+    config:
+      unique_key: [ 'order_number' ]
+      alias: fact_sales
+      on_schema_change: append_new_columns
+
+    columns:
+      - name: order_number
+        data_type: string
+        description: A unique identifier for each sales order, sourced from the staging sales details table.
+
+      - name: product_key
+        data_type: int
+        description: A unique key representing the product, joined from the product dimension table.
+
+      - name: customer_surrogate_id
+        data_type: int
+        description: A surrogate identifier for the customer, joined from the customer dimension table.
+
+      - name: order_date
+        data_type: string
+        description: The date when the order was placed. It is formatted as 'yyyyMMdd' and null if the original date is invalid or missing.
+
+      - name: shipping_date
+        data_type: string
+        description: The date when the order was shipped. It is formatted as 'yyyyMMdd' and null if the original date is invalid or missing.
+
+      - name: due_date
+        data_type: string
+        description: The date by which the order is due for delivery. It is formatted as 'yyyyMMdd' and null if the original date is invalid or missing.
+
+      - name: sales_amount
+        data_type: int
+        description: The total sales amount for the order, calculated as the product of quantity and price if the provided sales value is invalid or missing.
+
+      - name: quantity
+        data_type: int
+        description: The number of units of the product sold in the order.
+
+      - name: price
+        data_type: double
+        description: The price per unit of the product. If the provided price is invalid or missing, it is calculated as the absolute value of sales amount divided by quantity.
+    description: The fact_sales model aggregates sales data from the staging layer and enriches it with customer and product information from the marts layer. It includes details such as order number, product key, customer surrogate ID, order date, shipping date, due date, sales amount, quantity, and price. The model ensures data quality by handling invalid or missing values in dates, sales amounts, and prices, and calculates derived metrics where necessary.

@@ -10,10 +10,7 @@ WITH source_data AS (
 
 SELECT
     REPLACE(CID,'-','') AS CID
-    ,CASE
-        WHEN TRIM(CNTRY) = 'DE' THEN 'Germany'
-        WHEN TRIM(CNTRY) IN ('US', 'USA') THEN 'United States'
-        WHEN TRIM(CNTRY) = '' OR TRIM(CNTRY) IS NULL THEN 'n/a'
-        ELSE TRIM(CNTRY)
-    END AS CNTRY
+    ,{{ dev_standardization(
+          ref('country_standaryzation'), 
+          'CNTRY') }} AS CNTRY
 FROM source_data

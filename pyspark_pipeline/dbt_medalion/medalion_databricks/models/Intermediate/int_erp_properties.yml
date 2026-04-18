@@ -1,0 +1,69 @@
+models:
+  - name: int_erp__CUSR_AZ12
+    config:
+      unique_key: [ 'CID', 'BDATE' ]
+      alias: erp_cusr_az12
+      on_schema_change: append_new_columns
+    columns:
+      - name: CID
+        data_type: string
+        description: "A unique technical identifier for the customer."
+        constraints:
+          - type: not_null
+      - name: BDATE
+        data_type: date
+        description: "The birth date of the customer."
+      - name: GEN
+        data_type: string
+        description: "The gender of the customer"
+    description: The int_erp__CUSR_AZ12 model is an intermediate table that extracts customer data from the staging layer of the ERP system. It includes customer identifiers (CID), birth dates (BDATE), and gender information (GEN). This model serves as a foundational dataset for further transformations and analyses within the data pipeline.
+
+  - name: int_erp__LOC_A101
+    config:
+      unique_key: [ 'CID' ]
+      alias: erp_loc_a101
+      on_schema_change: append_new_columns
+
+    columns:
+      - name: CID
+        data_type: string
+        description: "A unique technical identifier for the customer."
+        constraints:
+          - type: not_null
+
+      - name: CNTRY
+        data_type: string
+        description: "The country associated with the customer, standardized to full country names."
+    description: The int_erp__LOC_A101 model is an intermediate layer that selects all columns from the staging table stg_erp__loc_a101 in the dbt_bara_project dataset. It serves as a transformation step to prepare data for further analysis or integration.
+
+  - name: int_erp__PX_CAT_G1V2
+    config:
+      unique_key: [ 'ID' ]
+      alias: erp_px_cat_g1v2
+      on_schema_change: append_new_columns
+    constraints:
+      - type: check
+        name: check_no_leading_trailing_spaces
+        columns: [ ID, CAT, SUBCAT, MAINTENANCE ]
+        expression: >
+          ID = TRIM(ID)  AND CAT = TRIM(CAT)  AND SUBCAT = TRIM(SUBCAT)  AND MAINTENANCE = TRIM(MAINTENANCE)
+
+    columns:
+      - name: ID
+        data_type: string
+        description: "A unique technical identifier for the category."
+        constraints:
+          - type: not_null
+
+      - name: CAT
+        data_type: string
+        description: "The main category classification for the product."
+
+      - name: SUBCAT
+        data_type: string
+        description: "The subcategory classification for the product, providing more granular categorization within the main category."
+
+      - name: MAINTENANCE
+        data_type: string
+        description: "Indicates whether the product is currently under maintenance (true) or not (false)."
+    description: The int_erp__PX_CAT_G1V2 model is an intermediate layer that extracts and transforms data from the staging table stg_erp__px_cat_g1v2. It includes columns for ID, CAT, SUBCAT, and MAINTENANCE, which represent key attributes for categorization and maintenance tracking within the ERP system.

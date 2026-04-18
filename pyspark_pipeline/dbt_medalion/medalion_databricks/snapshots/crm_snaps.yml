@@ -1,0 +1,28 @@
+snapshots:
+  - name: snapshot_crm_cust_info
+    relation: ref('stg_crm__cust_info')
+    description: "Snapshot of the CRM customer information table, capturing changes over time for analysis and historical reference."
+    config:
+      database: "{{ target.database }}"
+      schema: snapshots
+      alias: snap_crm__cust_info
+      strategy: timestamp
+      updated_at: cst_create_date
+      unique_key: cst_id
+      dbt_valid_to_current: CAST('9999-12-31' AS TIMESTAMP)
+      hard_deletes: ignore
+
+  - name: snapshot_sales_details
+    relation: ref('stg_crm__sales_details')
+    description: "Snapshot of the sales details table, tracking changes in sales transactions for historical analysis and reporting."
+    config:
+      database: "{{ target.database }}"
+      schema: snapshots
+      alias: snap_crm__sales_details
+      strategy: check
+      check_cols:
+        - sls_price
+        - sls_quantity
+        - sls_sales
+      unique_key: sls_ord_num
+      hard_deletes: ignore

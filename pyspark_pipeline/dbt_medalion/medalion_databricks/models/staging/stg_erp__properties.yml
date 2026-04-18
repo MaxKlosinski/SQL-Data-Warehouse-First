@@ -1,10 +1,8 @@
 models:
-  - name: bronze_clean_erp_CUSR_AZ12
+  - name: stg_erp__CUSR_AZ12
     config:
-      materialized: incremental
-      incremental_strategy: merge
       unique_key: [ 'CID', 'BDATE' ]
-      alias: silver_erp_cusr_az12
+      alias: stg_erp__CUSR_AZ12
       on_schema_change: append_new_columns
     columns:
       - name: CID
@@ -12,6 +10,7 @@ models:
         description: "A unique technical identifier for the customer."
         constraints:
           - type: not_null
+            warn_unsupported: false
       - name: BDATE
         data_type: date
         description: "The birth date of the customer."
@@ -20,12 +19,10 @@ models:
         description: "The gender of the customer"
     description: The bronze_clean_erp_CUSR_AZ12 model processes customer data from the bronze ERP layer by cleaning and standardizing the data. It removes invalid entries, formats gender values, and ensures birth dates are valid. Additionally, it eliminates duplicate records, retaining only the most recent entry based on the birth date.
 
-  - name: bronze_clean_erp_LOC_A101
+  - name: stg_erp__LOC_A101
     config:
-      materialized: incremental
-      incremental_strategy: merge
       unique_key: [ 'CID' ]
-      alias: silver_erp_loc_a101
+      alias: stg_erp__LOC_A101
       on_schema_change: append_new_columns
 
     columns:
@@ -34,20 +31,21 @@ models:
         description: "A unique technical identifier for the customer."
         constraints:
           - type: not_null
+            warn_unsupported: false
 
       - name: CNTRY
         data_type: string
         description: "The country associated with the customer, standardized to full country names."
+    description: The stg_erp__LOC_A101 model processes location data from the ERP system. It ensures unique records by selecting the first occurrence of each combination of CID and CNTRY. The model cleans and standardizes the CID column by removing dashes, and transforms the CNTRY column to provide consistent country names, handling cases such as 'USA', 'US', and 'DE', as well as empty or null values.
 
-  - name: bronze_clean_erp_PX_CAT_G1V2
+  - name: stg_erp__PX_CAT_G1V2
     config:
-      materialized: incremental
-      incremental_strategy: merge
       unique_key: [ 'ID' ]
-      alias: silver_erp_px_cat_g1v2
+      alias: stg_erp__PX_CAT_G1V2
       on_schema_change: append_new_columns
     constraints:
       - type: check
+        warn_unsupported: false
         name: check_no_leading_trailing_spaces
         columns: [ ID, CAT, SUBCAT, MAINTENANCE ]
         expression: >
@@ -59,6 +57,7 @@ models:
         description: "A unique technical identifier for the category."
         constraints:
           - type: not_null
+            warn_unsupported: false
 
       - name: CAT
         data_type: string

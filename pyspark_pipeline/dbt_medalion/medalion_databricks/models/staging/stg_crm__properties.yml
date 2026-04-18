@@ -1,10 +1,8 @@
 models:
-  - name: bronze_clean_crm_cust_info
+  - name: stg_crm__cust_info
     config:
-      materialized: incremental
-      incremental_strategy: merge
       unique_key: [ 'cst_id', 'cst_key' ]
-      alias: silver_crm_cust_info
+      alias: stg_crm__cust_info
       on_schema_change: append_new_columns
 
     columns:
@@ -13,58 +11,62 @@ models:
         description: "A unique technical identifier for the customer."
         constraints:
           - type: not_null
+            warn_unsupported: false
 
       - name: cst_key
         data_type: string
         description: "A business key for the customer (e.g., AW00011000)."
         constraints:
           - type: not_null
+            warn_unsupported: false
 
       - name: cst_firstname
         data_type: string
         description: "The first name of the customer."
+        constraints:
+          - type: not_null
+            warn_unsupported: false
 
       - name: cst_lastname
         data_type: string
         description: "The last name of the customer."
+        constraints:
+          - type: not_null
+            warn_unsupported: false
 
       - name: cst_marital_status
         data_type: string
         description: "The marital status of the customer (e.g., M - Married, S - Single)."
+        constraints:
+          - type: not_null
+            warn_unsupported: false
 
       - name: cst_gndr
         data_type: string
         description: "The gender of the customer."
+        constraints:
+          - type: not_null
+            warn_unsupported: false
 
       - name: cst_create_date
-        data_type: date
+        data_type: TIMESTAMP
         description: "The date when the record was created in the source system."
     description: The bronze_clean_crm_cust_info model processes customer information from the bronze CRM layer. It removes duplicate records based on customer ID (cst_id) and ensures only the most recent record is retained using the creation date (cst_create_date). Additionally, it cleans and standardizes customer attributes such as first name, last name, marital status, and gender. Marital status and gender are transformed into human-readable formats, and null values are handled appropriately.
 
-  - name: bronze_clean_crm_prd_info
+  - name: stg_crm__prd_info
     config:
-      materialized: incremental
-      incremental_strategy: merge
       unique_key: [ 'prd_id', 'prd_end_dt', 'prd_start_dt' ]
-      alias: silver_crm_prd_info
+      alias: stg_crm__prd_info
       on_schema_change: append_new_columns
-    constraints:
-      - type: check
-        expression: "prd_start_dt <= prd_end_dt OR prd_end_dt IS NULL"
-        columns: [ 'prd_start_dt', 'prd_end_dt' ]
 
     columns:
       - name: prd_id
         data_type: int
         description: "A unique technical identifier for the product."
 
-      - name: cat_id
-        data_type: string
-        description: "A category identifier derived from the product key."
-
       - name: prd_key
         data_type: string
-        description: "A business key for the product (e.g., BK-PRD-00001)."
+        description: "A business key for the product (e.g., CO-RF-FR-R92B-58)."
 
       - name: prd_nm
         data_type: string
@@ -75,6 +77,8 @@ models:
         description: "The cost of the product. Null values are treated as 0."
         constraints:
           - type: not_null
+            warn_unsupported: false
+
 
       - name: prd_line
         data_type: string
@@ -85,30 +89,15 @@ models:
         description: "The start date of the product's validity period."
 
       - name: prd_end_dt
-        data_type: timestamp
+        data_type: date
         description: "The end date of the product's validity period, calculated as the day before the next record's start date for the same product key."
     description: The bronze_clean_crm_prd_info model processes raw product information from the CRM system, transforming and cleaning the data for further analysis. It includes operations such as extracting and formatting category IDs and product keys, handling null values in product costs, categorizing product lines, and calculating product end dates based on start dates. This model serves as a foundational layer for downstream analytics and reporting.
 
-  - name: bronze_clean_crm_sales_details
+  - name: stg_crm__sales_details
     config:
-      materialized: incremental
-      incremental_strategy: merge
       unique_key: [ 'sls_ord_num' ]
-      alias: silver_crm_sales_details
+      alias: stg_crm__sales_details
       on_schema_change: append_new_columns
-
-    constraints:
-      - type: check
-        name: check_valid_ship_date
-        columns: [ sls_ship_dt ]
-        expression: >
-          sls_ship_dt > 0  AND length(cast(sls_ship_dt as string)) = 8  AND cast(sls_ship_dt AS int) BETWEEN 19000101 AND 20500101
-
-      - type: check
-        name: check_sales_math_and_positive
-        columns: [ sls_sales, sls_quantity, sls_price ]
-        expression: >
-          sls_sales = (sls_quantity * sls_price)  AND sls_sales > 0  AND sls_quantity > 0  AND sls_price > 0
 
     columns:
       - name: sls_ord_num
@@ -124,15 +113,15 @@ models:
         description: "The customer ID associated with the sales order."
 
       - name: sls_order_dt
-        data_type: string
+        data_type: int
         description: "The date when the order was placed."
 
       - name: sls_ship_dt
-        data_type: string
+        data_type: int
         description: "The date when the order was shipped."
 
       - name: sls_due_dt
-        data_type: string
+        data_type: int
         description: "The date when the order is due."
 
       - name: sls_sales
@@ -140,16 +129,20 @@ models:
         description: "The total sales amount for the order."
         constraints:
           - type: not_null
+            warn_unsupported: false
 
       - name: sls_quantity
         data_type: int
         description: "The quantity of products sold in the order."
         constraints:
           - type: not_null
+            warn_unsupported: false
 
       - name: sls_price
-        data_type: double
+        data_type: int
         description: "The price per unit for the products sold in the order."
         constraints:
           - type: not_null
+            warn_unsupported: false
+
     description: The bronze_clean_crm_sales_details model processes raw sales data from the CRM system, ensuring data quality and consistency. It performs deduplication, validates and formats date fields, and calculates accurate sales and price values based on quantity and price. This model serves as a cleaned and standardized version of the raw sales data for downstream analysis.

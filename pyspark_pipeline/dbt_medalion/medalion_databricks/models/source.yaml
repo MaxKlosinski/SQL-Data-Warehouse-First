@@ -1,13 +1,13 @@
 sources:
   - name: crm_sources
     description: A data source for the CRM system.
-    database: bronze
-    schema: crm
+    database: dbt_bara_project
+    schema: landing
 
     tables:
       - name: cust_info
         description: The table contains customer information for CRM purposes. It includes details such as customer IDs, names, marital status, gender, and the date of account creation. This data can be used to analyze customer demographics, identify trends within customer groups, and support targeted marketing efforts.
-        identifier: bronze_crm_cust_info
+        identifier: lnd_crm_cust_info
         config:
           loaded_at_field: cst_create_date
           freshness:
@@ -34,7 +34,7 @@ sources:
 
       - name: prd_info
         description: The table contains product information used in CRM processes. It includes details such as product IDs, names, costs, and relevant date ranges. This data can be used to track product offerings, analyze pricing strategies, and manage inventory timelines.\
-        identifier: bronze_crm_prd_info
+        identifier: lnd_crm_prd_info
         data_tests:
           # Date Logic Validity Check
           # Description: Ensures that the Product Start Date does not occur after 
@@ -67,7 +67,7 @@ sources:
             
       - name: sales_details
         description: This table contains detailed sales information related to customer orders. It includes data such as order number, product key, customer ID, order dates, shipping dates, due dates, sales amounts, quantities, and prices. Users can utilize this data for analyzing sales trends, evaluating product performance, and improving customer relationship management.
-        identifier: bronze_crm_sales_details
+        identifier: lnd_crm_sales_details
         data_tests:
           # We're checking to see if the the total sales value (sls_sales) 
           # always equals the unit price (sls_price) multiplied by the 
@@ -104,13 +104,13 @@ sources:
       
   - name: erp_sources
     description: A data source for the ERP system.
-    database: bronze
-    schema: erp
+    database: dbt_bara_project
+    schema: landing
     
     tables:
       - name: cust_az12
         description: The table contains customer records from the ERP system, including details such as customer ID, birthdate, and gender. It also includes a field for error records, which can help in identifying incomplete or erroneous data. Use cases include analyzing customer demographics and ensuring data quality in customer records.
-        identifier: bronze_erp_cust_az12
+        identifier: lnd_erp_cust_az12
         
         columns:
           - name: CID
@@ -126,7 +126,7 @@ sources:
       
       - name: loc_a101
         description: The table contains information related to ERP data localization, focusing on country-specific identifiers. Potential use cases include analyzing regional data distribution and identifying discrepancies in records. It also includes a column for error records, which can help in troubleshooting and data validation.
-        identifier: bronze_erp_loc_a101
+        identifier: lnd_erp_loc_a101
         
         columns:
           - name: CID
@@ -136,7 +136,7 @@ sources:
       
       - name: px_cat_g1v2
         description: This table contains product category information from the ERP system. It includes details about main categories and subcategories, along with a field for maintenance notes. Potential use cases include analyzing product categorization, tracking changes in product lines, and identifying any errors in the category data.
-        identifier: bronze_erp_px_cat_g1v2
+        identifier: lnd_erp_px_cat_g1v2
         
         columns:
           - name: ID

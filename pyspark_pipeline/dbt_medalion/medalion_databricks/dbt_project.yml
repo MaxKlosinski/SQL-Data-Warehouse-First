@@ -27,25 +27,48 @@ flags:
   use_concurrent_microbatch: true
   use_materialization_v2: true
 
-# Configuring models
-# Full documentation: https://docs.getdbt.com/docs/configuring-models
+seeds:
+  +enabled: true
+  +tags: seed
+  +database: "{{ target.database }}"
+  +schema: seeds
 
 models:
   medalion_databricks:
-    silver:
-      crm:
+    staging:
+      +enabled: true
+      +tags: staging
+      +database: dbt_bara_project
+      +schema: staging
+      +full_refresh: false
+      +materialized: view
+      +contract:
+        enforced: true
+    Intermediate:
+      +enabled: true
+      +tags: intermediate
+      +database: dbt_bara_project
+      +schema: intermediate
+      +full_refresh: false
+      +materialized: ephemeral
+      +contract:
+        enforced: true
+    marts:
+      dimension_table:
         +enabled: true
-        +tags: silver_crm
-        +database: silver
-        +schema: silver_crm
+        +tags: marts_dimension
+        +database: dbt_bara_project
+        +schema: marts
         +full_refresh: false
+        +materialized: table
         +contract:
           enforced: true
-      erp:
+      fact_table:
         +enabled: true
-        +tags: silver_erp
-        +database: silver
-        +schema: silver_erp
-        +full_refresh: false
+        +tags: marts_fact
+        +database: dbt_bara_project
+        +schema: marts
+        +full_refresh: true
+        +materialized: table
         +contract:
           enforced: true
