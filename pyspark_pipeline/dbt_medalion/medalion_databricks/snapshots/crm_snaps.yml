@@ -6,10 +6,15 @@ snapshots:
       database: "{{ target.database }}"
       schema: snapshots
       alias: snap_crm__cust_info
+      # The timestamp strategy compares a timestamp column (updated_at) to see if a row has changed
       strategy: timestamp
+      # Column used to determine if the record has been updated since the last snapshot
       updated_at: cst_create_date
+      # Primary key of the table, used to uniquely identify records across time
       unique_key: cst_id
+      # Sets the 'valid_to' date for the current active record to a custom future date instead of NULL
       dbt_valid_to_current: CAST('9999-12-31' AS TIMESTAMP)
+      # When ignore, rows deleted in the source are not marked as invalid in the snapshot
       hard_deletes: ignore
 
   - name: snapshot_sales_details
@@ -19,10 +24,14 @@ snapshots:
       database: "{{ target.database }}"
       schema: snapshots
       alias: snap_crm__sales_details
+      # The check strategy compares a list of columns (check_cols) to see if any have changed
       strategy: check
+      # Columns to check for changes; a new snapshot record is created if any of these change
       check_cols:
         - sls_price
         - sls_quantity
         - sls_sales
+      # Primary key of the table, used to uniquely identify records across time
       unique_key: sls_ord_num
+      # When ignore, rows deleted in the source are not marked as invalid in the snapshot
       hard_deletes: ignore

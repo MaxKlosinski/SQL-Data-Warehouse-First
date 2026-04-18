@@ -21,10 +21,9 @@
     documentation.    
     #}
 
-    {# {% if flags.WHICH != "run" %}
+    {% if flags.WHICH != "run" %}
         {%- set results = run_query(column_values_sql) %}
-    {% endif %} #}
-    {%- set results = run_query(column_values_sql) -%}
+    {% endif %}
     
     CASE
 

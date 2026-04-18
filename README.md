@@ -1,26 +1,66 @@
-# SQL Data Warehouse – an educational project based on the Data with Baraa methodology
-Link: https://www.youtube.com/watch?v=9GVqKuTVANE&t=9350s
+# This project outlines a data engineering process that utilizes industry-standard data processing patterns
 
-# The structure of my project
-My project implements an ETL/ELT process. However, my entire project consists of two parts. 
-- The first part involves implementing SQL code and preparing the Medallion schema. The entire project is built on Microsoft SQL Server.
+**Executive Summary:**
+This project demonstrates a comprehensive end-to-end Data Engineering pipeline. It implements an ETL/ELT process to ingest, process, and transform data using a Medallion Architecture (Bronze, Silver, Gold). The project is divided into two distinct implementations: a foundational phase using Microsoft SQL Server, and a modern, cloud-native phase utilizing Databricks, PySpark, and dbt.
 
-- The second part implements the entire operational logic using the following technologies:
-  - dbt labs for project management and preparing the appropriate data transformations.
-  - Databricks + Pyspark as tools for retrieving raw data and storing it in the form of tables. I implemented this process using Auto Loader as the tool for retrieving raw data. Data processing was carried out as an ETL pipeline using the Databricks platform (Apache Spark). Databricks Jobs / Workflows were used for orchestration and automation of code execution.
+**Tech Stack:**
 
-# What I learned
-## What I learned in the first part of the project:
-1. **Data Architecture:** Designing a Data Warehouse Using Medallion Architecture Bronze, Silver, and Gold layers.
-2. **ETL Pipelines:** Extracting, transforming, and loading data from source systems into the warehouse.
-3. **Data Modeling:** Developing fact and dimension tables optimized for analytical queries.
-4. **Analytics & Reporting:** Creating SQL-based reports and dashboards for actionable insights.
-5. **I learned how to create documentation:** Thanks to the content presented in the first draft, I learned what I should focus on when writing documentation and what it should include.
+- **Modern Stack:** Databricks, dbt (data build tool), PySpark, Unity Catalog
+- **Traditional Stack:** Microsoft SQL Server, T-SQL
+- **Methodology:** Medallion Architecture, ETL/ELT, Data Governance, Schema Evolution
+- **Orchestration:** Databricks Workflows / Jobs, Auto Loader
 
-## What I learned in the second part of my project:
-1. **Databricks Architecture:** I learned about the directory structure in the unit catalog, how to use it, and how to retrieve data from it.
-2. **Auto Loader in Databricks:** I have learned how to use and properly configure the Auto Loader data retrieval technology.
-3. **Implementing dbt labs in Visual Studio and using the profiles.yml file:** I learned how to set up dbt labs in Visual Studio and how to connect to Databricks, and I learned the basics of managing profiles in the file used to connect to databases; the name of this file is profiles.yml
-4. **I learned how to create macros in dbt labs:** I learned how to write macros and how to use them to automate my code and speed up my work, both by writing them myself and by using pre-made macro packages like dbt.utils.
-5. **Writing YAML configuration files:** I gained experience in preparing configuration files for my models, seeds, and snapshots. I also learned how to write the source file so that it would run the tests correctly and locate my data files.
-6. **Proficient reading of documentation:** Thanks to the many configuration files I've created, I've learned to work efficiently with documentation.
+---
+
+## Project Architecture
+
+The project is structured around two main technological approaches to building a data warehouse:
+
+1. **SQL Server Pipeline (`sql_pipeline/`):**
+   - A traditional approach building the Medallion schema entirely within Microsoft SQL Server using T-SQL.
+   - Focuses on raw SQL implementation, data modeling, and creating a comprehensive data catalog.
+
+2. **Databricks & dbt Pipeline (`pyspark_pipeline/`):**
+
+- **Ingestion:** Leverages **Databricks Auto Loader** for efficient, incremental ingestion into Delta tables, ensuring robust handling of schema evolution.
+- **Transformation:** Uses **dbt** to manage the transformation logic. Data is refined through Bronze, Silver, and Gold layers using modular SQL models.
+- **Orchestration:** Fully automated via Databricks Workflows.
+
+---
+
+## Repository Structure
+
+- `sql_pipeline/`: Contains T-SQL scripts defining the Bronze, Silver, and Gold layers, along with project naming conventions and a detailed `Data catalog.md`.
+- `pyspark_pipeline/databricks_pipeline/`: Contains Python/PySpark notebooks responsible for data ingestion and initial processing in Databricks.
+- `pyspark_pipeline/dbt_medalion/`: Contains the dbt project, including configuration (`dbt_project.yml`, `packages.yml`, `package-lock.yml`), macros, and SQL models for data transformation.
+
+---
+
+## Key Skills & Competencies
+
+### Data Modeling & SQL Fundamentals
+
+- **Architectural Design:** Designed a multi-layered warehouse following Medallion principles to ensure data quality.
+- **Documentation:** Created a detailed Data Catalog to maintain clear definitions and metadata, making data understandable for stakeholders and end users.
+
+### Modern Data Stack (Databricks & dbt)
+
+- **Data Governance:** Implemented structured data management within **Unity Catalog**, ensuring secure and organized data access.
+- **Efficient Ingestion:** Leveraged **PySpark Structured Streaming** and **Databricks Auto Loader** for robust, incremental data ingestion into **Delta Lake** tables. Implemented schema inference, strict schema evolution controls, and checkpointing for fault-tolerant pipelines.
+- **Modern dbt Practices:**
+  - **Data Quality & Validation:** Implemented rigorous data validation using native dbt tests alongside advanced testing frameworks (`dbt_expectations`, `dbt_utils`) to ensure data integrity.
+  - **Historical Tracking:** Utilized YAML-based snapshot configurations to implement **Slowly Changing Dimensions (SCD Type 2)**, maintaining a complete audit trail of dimension changes.
+  - **Data Standardization:** Leveraged **dbt seeds** for static mapping tables to standardize inconsistent data formats (e.g., country codes, gender).
+  - **SLA Monitoring:** Configured source freshness checks to monitor data latency and ensure timely pipeline execution.
+  - **DRY Engineering:** Developed **custom dbt macros** and integrated `dbt_utils` to keep the codebase DRY and scalable.
+  - Established secure connections via `profiles.yml` and utilized environment variables for best-practice security.
+- **Workflow Automation:** Orchestrated complex pipelines using Databricks Jobs, ensuring reliable end-to-end execution.
+
+---
+
+## Summary
+
+This project served as a practical sandbox to develop my data engineering skills across both traditional and modern data environments. By independently building the same ETL pipeline in SQL Server and then migrating it to Databricks and dbt, I gained hands-on experience with the complete data lifecycle—from ingestion and transformation to documentation and orchestration.
+
+---
+**Inspiration and Sources**: This project was inspired by and serves as an educational extension of the Data with Baraa methodology ([YouTube Link](https://www.youtube.com/watch?v=9GVqKuTVANE&t=9350s)).*

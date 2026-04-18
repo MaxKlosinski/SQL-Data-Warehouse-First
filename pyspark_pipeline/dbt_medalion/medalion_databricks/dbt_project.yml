@@ -1,12 +1,11 @@
-
 # Name your project! Project names should contain only lowercase characters
 # and underscores. A good package name should reflect your organization's
 # name or the intended use of these models
-name: 'medalion_databricks'
-version: '1.0.0'
+name: "medalion_databricks"
+version: "1.0.0"
 
 # This setting configures which "profile" dbt uses for this project.
-profile: 'medalion_databricks'
+profile: "medalion_databricks"
 
 # These configurations specify where dbt should look for different types of files.
 # The `model-paths` config, for example, states that models in this project can be
@@ -18,13 +17,16 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-clean-targets:         # directories to be removed by `dbt clean`
+clean-targets:
   - "target"
   - "dbt_packages"
 
 flags:
+  # Enables native Iceberg table format support on Databricks
   use_managed_iceberg: true
+  # Allows concurrent execution of microbatches for faster streaming processing
   use_concurrent_microbatch: true
+  # Uses the newer, more performant materialization strategy for Databricks adapters
   use_materialization_v2: true
 
 seeds:
@@ -42,6 +44,7 @@ models:
       +schema: staging
       +full_refresh: false
       +materialized: view
+      # Enforces model contracts, ensuring the data matches the defined schema and types
       +contract:
         enforced: true
     Intermediate:
@@ -50,7 +53,9 @@ models:
       +database: dbt_bara_project
       +schema: intermediate
       +full_refresh: false
+      # Ephemeral models are not built into the database; instead, their code is interpolated into downstream models like a CTE
       +materialized: ephemeral
+      # Enforces model contracts, ensuring the data matches the defined schema and types
       +contract:
         enforced: true
     marts:
@@ -61,6 +66,7 @@ models:
         +schema: marts
         +full_refresh: false
         +materialized: table
+        # Enforces model contracts, ensuring the data matches the defined schema and types
         +contract:
           enforced: true
       fact_table:
@@ -68,7 +74,9 @@ models:
         +tags: marts_fact
         +database: dbt_bara_project
         +schema: marts
+        # Forces a full rebuild of the table on every run instead of an incremental update
         +full_refresh: true
         +materialized: table
+        # Enforces model contracts, ensuring the data matches the defined schema and types
         +contract:
           enforced: true
