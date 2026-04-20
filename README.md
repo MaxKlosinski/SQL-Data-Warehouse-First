@@ -53,7 +53,7 @@ The project is structured around two main technological approaches to building a
   - **SLA Monitoring:** Configured source freshness checks to monitor data latency and ensure timely pipeline execution.
   - **DRY Engineering:** Developed **custom dbt macros** and integrated `dbt_utils` to keep the codebase DRY and scalable.
   - Established secure connections via `profiles.yml` and utilized environment variables for best-practice security.
-- **Workflow Automation:** Orchestrated complex pipelines using Databricks Jobs, ensuring reliable end-to-end execution.
+- **Workflow Automation:** Orchestrated pipelines using Databricks Jobs, ensuring reliable end-to-end execution.
 
 ---
 
