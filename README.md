@@ -1,11 +1,11 @@
-# This project outlines a data engineering process that utilizes industry-standard data processing patterns
+# End-to-End Data Pipeline (SQL Server & Databricks & dbt)
 
 **Executive Summary:**
-This project demonstrates a comprehensive end-to-end Data Engineering pipeline. It implements an ETL/ELT process to ingest, process, and transform data using a Medallion Architecture (Bronze, Silver, Gold). The project is divided into two distinct implementations: a foundational phase using Microsoft SQL Server, and a modern, cloud-native phase utilizing Databricks, PySpark, and dbt.
+This project demonstrates a Data Engineering pipeline. It implements an ETL/ELT process to ingest, process, and transform data using a Medallion Architecture (Bronze, Silver, Gold). The project is divided into two distinct implementations: a foundational phase using Microsoft SQL Server, and a modern, cloud-native phase utilizing Databricks, PySpark, and dbt.
 
 **Tech Stack:**
 
-- **Modern Stack:** Databricks, dbt (data build tool), PySpark, Unity Catalog
+- **Modern Stack** Databricks, dbt (a database management tool), PySpark, Unity Catalog
 - **Traditional Stack:** Microsoft SQL Server, T-SQL
 - **Methodology:** Medallion Architecture, ETL/ELT, Data Governance, Schema Evolution
 - **Orchestration:** Databricks Workflows / Jobs, Auto Loader
@@ -63,4 +63,4 @@ The project is structured around two main technological approaches to building a
 This project served as a practical sandbox to develop my data engineering skills across both traditional and modern data environments. By independently building the same ETL pipeline in SQL Server and then migrating it to Databricks and dbt, I gained hands-on experience with the complete data lifecycle—from ingestion and transformation to documentation and orchestration.
 
 ---
-**Inspiration and Sources**: This project was inspired by and serves as an educational extension of the Data with Baraa methodology ([YouTube Link](https://www.youtube.com/watch?v=9GVqKuTVANE&t=9350s)).*
+**Inspiration and Sources**: This project was inspired by and serves as an educational extension of the Data with Baraa methodology ([YouTube Link](https://www.youtube.com/watch?v=9GVqKuTVANE&t=9350s)).
