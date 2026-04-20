@@ -1,6 +1,5 @@
 # End-to-End Data Pipeline (SQL Server & Databricks & dbt)
 
-**Executive Summary:**
 This project demonstrates a Data Engineering pipeline. It implements an ETL/ELT process to ingest, process, and transform data using a Medallion Architecture (Bronze, Silver, Gold). The project is divided into two distinct implementations: a foundational phase using Microsoft SQL Server, and a modern, cloud-native phase utilizing Databricks, PySpark, and dbt.
 
 **Tech Stack:**
