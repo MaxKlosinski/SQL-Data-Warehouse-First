@@ -62,4 +62,4 @@ The project is structured around two main technological approaches to building a
 This project served as a practical sandbox to develop my data engineering skills across both traditional and modern data environments. By independently building the same ETL pipeline in SQL Server and then migrating it to Databricks and dbt, I gained hands-on experience with the complete data lifecycle—from ingestion and transformation to documentation and orchestration.
 
 ---
-**Inspiration and Sources**: This project was inspired by and serves as an educational extension of the Data with Baraa methodology ([YouTube Link](https://www.youtube.com/watch?v=9GVqKuTVANE&t=9350s)).
+**Inspiration and Sources**: This project was developed based on the “Data with Baraa” methodology and serves as an educational extension of it. I also used data from this material to create and test my own project. ([YouTube Link](https://www.youtube.com/watch?v=9GVqKuTVANE&t=9350s)).
